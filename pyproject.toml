@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "todo_fastapi_codex"
+version = "0.1.0"
+description = "Simple FastAPI TODO app skeleton"
+authors = ["OpenAI Assistant <assistant@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+pydantic = "^2.7.0"
+sqlalchemy = "^2.0.29"
+databases = "^0.9.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+httpx = "^0.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
