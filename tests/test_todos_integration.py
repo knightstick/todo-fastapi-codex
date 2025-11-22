@@ -1,46 +1,9 @@
 """Integration tests for todo API endpoints using TestClient."""
 
-import importlib
-import sys
-from pathlib import Path
-from typing import Iterator
-
-import pytest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-from app.core import config
 from app.schemas.todo import TodoInDB
-
-
-@pytest.fixture()
-def client(tmp_path, monkeypatch) -> Iterator[TestClient]:
-    """Provide a TestClient wired to an isolated SQLite database."""
-
-    test_db = tmp_path / "test.db"
-    db_url = f"sqlite:///{test_db}"
-    monkeypatch.setattr(config.settings, "database_url", db_url)
-
-    # Reload modules to bind to the test database URL.
-    import app.db as db
-    import app.models.todo as models
-    import app.crud.todo as crud_todo
-    import app.crud as crud_pkg
-    import app.api.routes.todos as routes
-    import app.main as main
-
-    importlib.reload(db)
-    importlib.reload(models)
-    importlib.reload(crud_todo)
-    importlib.reload(crud_pkg)
-    importlib.reload(routes)
-    main = importlib.reload(main)
-
-    with TestClient(main.app) as client:
-        yield client
 
 
 def test_todo_lifecycle(client: TestClient) -> None:

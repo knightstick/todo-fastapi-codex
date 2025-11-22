@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 
 from app import crud
+from app.api.routes.lists import router as lists_router
 from app.api.routes.todos import router as todos_router
 from app.core.config import settings
 from app.db import database, engine, metadata
@@ -10,6 +11,7 @@ from app.db import database, engine, metadata
 
 metadata.create_all(bind=engine)
 app = FastAPI(title=settings.app_name)
+app.include_router(lists_router)
 app.include_router(todos_router)
 
 

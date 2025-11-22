@@ -1,5 +1,5 @@
 """CRUD package exports."""
 
-from app.crud import todo
+from app.crud import lists, todo
 
-__all__ = ["todo"]
+__all__ = ["lists", "todo"]
