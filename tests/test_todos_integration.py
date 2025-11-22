@@ -7,11 +7,13 @@ from typing import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import TypeAdapter
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.core import config
+from app.schemas.todo import TodoInDB
 
 
 @pytest.fixture()
@@ -48,6 +50,7 @@ def test_todo_lifecycle(client: TestClient) -> None:
     list_response = client.get("/todos/")
     assert list_response.status_code == 200
     assert list_response.json() == []
+    TypeAdapter(list[TodoInDB]).validate_python(list_response.json())
 
     # Create a new todo item.
     todo_payload = {
@@ -61,12 +64,14 @@ def test_todo_lifecycle(client: TestClient) -> None:
     assert created["title"] == todo_payload["title"]
     assert created["description"] == todo_payload["description"]
     assert created["is_completed"] is todo_payload["is_completed"]
+    TodoInDB.model_validate(created)
     todo_id = created["id"]
 
     # Retrieve the created item.
     read_response = client.get(f"/todos/{todo_id}")
     assert read_response.status_code == 200
     assert read_response.json() == created
+    TodoInDB.model_validate(read_response.json())
 
     # Update the todo entry.
     update_payload = {"title": "Write more tests", "is_completed": True}
@@ -76,11 +81,13 @@ def test_todo_lifecycle(client: TestClient) -> None:
     assert updated["title"] == update_payload["title"]
     assert updated["description"] == todo_payload["description"]
     assert updated["is_completed"] is True
+    TodoInDB.model_validate(updated)
 
     # Verify listing reflects the updated item.
     list_after_update = client.get("/todos/")
     assert list_after_update.status_code == 200
     assert list_after_update.json() == [updated]
+    TypeAdapter(list[TodoInDB]).validate_python(list_after_update.json())
 
     # Delete the todo and ensure it's gone.
     delete_response = client.delete(f"/todos/{todo_id}")
